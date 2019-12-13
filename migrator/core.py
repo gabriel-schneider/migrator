@@ -88,6 +88,16 @@ class Migrator:
             migration.load(filename)
             self.add(migration)
 
+    def add_from_directory(self, directory: Union[str, Path]):
+        if not isinstance(directory, Path):
+            directory = Path(directory)
+
+        if not directory.is_dir():
+            raise Exception("Path is not a directory!")
+
+        for filename in directory.iterdir():
+            self.add_from_file(filename)
+
     @property
     def migrations(self):
         return sorted(self._migrations, key=lambda x: x.version)

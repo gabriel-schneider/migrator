@@ -94,3 +94,21 @@ def test_rollback_without_version():
     assert not table_exists(connection, "permission")
     assert not table_exists(connection, "media")
     assert not table_exists(connection, "users_permissions")
+
+
+def test_load_migrations_from_directory():
+    connection = sqlite3.connect(":memory:")
+    adapter = SQLiteAdapter(connection)
+    migrator = Migrator(adapter, "")
+
+    migrator.add_from_directory("tests/data/migrations")
+
+    def has_migration(name):
+        for migration in migrator.migrations:
+            if migration.name == name:
+                return True
+        return False
+
+    assert has_migration("20191127162300_user_table")
+    assert has_migration("20191127170816_users_permissions_table")
+    assert has_migration("20191207231210_add_media_mime")
